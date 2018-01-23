@@ -112,8 +112,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="ass2.cpp" />
-    <ClCompile Include="binarynode.cpp" />
-    <ClCompile Include="binarysearchtree.cpp" />
+    <ClCompile Include="binarynode.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="binarysearchtree.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="binarynode.h" />
