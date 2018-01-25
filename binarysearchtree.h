@@ -18,6 +18,7 @@
 
 //extra includes
 #include<list>
+#include<algorithm>
 
 using namespace std;
 
@@ -75,7 +76,13 @@ private:
 	BinaryNode<ItemType>* findNode(BinaryNode<ItemType>* subTreePtr, const ItemType& target) const;
 	// helper function for displaySideways to work recursively
 	void sideways(BinaryNode<ItemType>* current, int level) const;
+	
 	// other functions....
+	void deleteTree(BinaryNode<ItemType>* current);
+	int getHeightHelper(BinaryNode<ItemType> * current) const;
+	int getNodeCountHelper(BinaryNode<ItemType> * current) const;
+	void inorder(void visit(ItemType&), BinaryNode<ItemType> * current) const;
+	BinaryNode<ItemType> * copyTree(const BinaryNode<ItemType> * current) const;
 };
 
 //#include "binarysearchtree.cpp"
@@ -114,6 +121,7 @@ BinarySearchTree<ItemType>::BinarySearchTree() {
 	//ctor
 }
 
+
 template<class ItemType>
 BinarySearchTree<ItemType>::~BinarySearchTree() {
 	clear();
@@ -126,114 +134,150 @@ BinarySearchTree<ItemType>::BinarySearchTree(const ItemType& rootItem) {
 
 template<class ItemType>
 BinarySearchTree<ItemType>::BinarySearchTree(const BinarySearchTree<ItemType>& bst) {
+	rootPtr = copyTree(bst.rootPtr);
 }
 
+template<class ItemType>
+BinaryNode<ItemType> * BinarySearchTree<ItemType>::copyTree(const BinaryNode<ItemType> * current) const
+{
+	BinaryNode<ItemType> * otherTreePtr = nullptr;
+	if (current != nullptr)
+	{
+		otherTreePtr = new BinaryNode<ItemType>(current->getItem());
+		otherTreePtr->setLeftChildPtr(copyTree(current->getLeftChildPtr())); 
+		otherTreePtr->setRightChildPtr(copyTree(current->getRightChildPtr()));
+	}
+}
 template<class ItemType>
 bool BinarySearchTree<ItemType>::isEmpty() const {
 	return (rootPtr == nullptr) ? true : false;
 }
 
 template<class ItemType>
+int BinarySearchTree<ItemType>::getHeightHelper(BinaryNode<ItemType> * current) const
+{
+	if (current == nullptr)
+		return 0;
+	else
+		return 1 + max(getHeightHelper(current->getLeftChildPtr()), 
+			getHeightHelper(current->getRightChildPtr()));
+}
+template<class ItemType>
 int BinarySearchTree<ItemType>::getHeight() const {
-	list<ItemType> treeList;
-	treeList.push_front(rootPtr*);
-	list<ItemType>::iterator it = treeList.begin();
-	int level = 1;
-	int babyCount = 0;
-	int countDown = 1;
-	while (it != treeList.end())
-	{
-		if (it->leftPtr != nullptr)
-		{
-			babyCount++;
-			treeList.push_front(it->leftPtr);
-		}
-		if (it->rightPtr != nullptr)
-		{
-			babyCount++;
-			treeList.push_front(it->rightPtr);
-		}
-		it++; // advance iterator
-		if (countDown = 1)
-		{
-			level++;
-			countDown = babyCount;
-			babyCount = 0;
-		}
-		else
-			countDown--;
-	}
-
-	return level;
+	return getHeightHelper(rootPtr);
 }
 
+template<class ItemType>
+int BinarySearchTree<ItemType>::getNodeCountHelper(BinaryNode<ItemType> * current) const
+{
+	if (current == nullptr)
+		return 0;
+	else
+		return 1 + getNodeCountHelper(current->getLeftChildPtr()) + 
+		getNodeCountHelper(current->getRightChildPtr());
+
+}
 
 template<class ItemType>
 int BinarySearchTree<ItemType>::getNumberOfNodes() const {
-	int num = 0;
-	list<ItemType> treeList;
-	treeList.push_front(rootPtr*);
-	list<ItemType>::iterator it = treeList.begin();
-	while (it != treeList.end())
-	{
-		if (it->leftPtr != nullptr)
-			treeList.push_front(it->leftPtr);
-
-		if (it->rightPtr != nullptr)
-			treeList.push_front(it->rightPtr);
-
-		it++;
-	}
-	num = treeList.size();
-
-	return num;
+	return getNodeCountHelper(rootPtr);
 }
 
 template<class ItemType>
 bool BinarySearchTree<ItemType>::add(const ItemType& item) {
+	
 	if (rootPtr == nullptr)
 		rootPtr = new BinaryNode<ItemType>(item);
 	else
 	{
-		//if item greater
-		//if null
-			//add new on right
-		// if not null
-			//call add on right
+		BinaryNode<ItemType> * nodeCheck;
+		BinaryNode<ItemType> * tempNewNode = new BinaryNode<ItemType>(item);
+		nodeCheck = placeNode(rootPtr, tempNewNode);
 
-		//if item less
-		//if null
-			//add new on left
-		//if not null
-			//call add on left
+		if(nodeCheck == nullptr) // for items equal to item in tree
+			return false;
 
-		//if item==
-			//return false;
 	}
 	return true;
 }
 
 template<class ItemType>
+void BinarySearchTree<ItemType>::deleteTree(BinaryNode<ItemType>* current)
+{
+	if (current != nullptr)
+	{
+		deleteTree(current->getLeftChildPtr());
+		deleteTree(current->getRightChildPtr());
+		delete current;
+	}
+}
+
+template<class ItemType>
 void BinarySearchTree<ItemType>::clear() {
+	deleteTree(rootPtr);
+	rootPtr = nullptr;
 }
 
 template<class ItemType>
 bool BinarySearchTree<ItemType>::contains(const ItemType& item) const {
+	if (findNode(rootPtr, item) == nullptr)
+		return false;
 	return true;
 }
-
+ //returns nullptr if item is not placed. 
 template<class ItemType>
 BinaryNode<ItemType>* BinarySearchTree<ItemType>::placeNode(BinaryNode<ItemType>* subTreePtr, BinaryNode<ItemType>* newNodePtr) {
-	return nullptr;
+	//check right
+	if (newNodePtr->getItem()> subTreePtr->getItem())
+	{
+		if (subTreePtr->getRightChildPtr() == nullptr)
+			subTreePtr->setRightChildPtr(newNodePtr);
+		else
+			placeNode(subTreePtr->getRightChildPtr(), newNodePtr);
+	}
+	//check left
+	if (newNodePtr->getItem() < subTreePtr->getItem())
+	{
+		if (subTreePtr->getLeftChildPtr() == nullptr)
+			subTreePtr->setLeftChildPtr(newNodePtr);
+		else
+			placeNode(subTreePtr->getLeftChildPtr(), newNodePtr);
+	}
+	if (newNodePtr->getItem() == subTreePtr->getItem())
+		return nullptr;
+
+	return subTreePtr;
 }  // end placeNode
 
+//returns null if not found
 template<class ItemType>
 BinaryNode<ItemType>* BinarySearchTree<ItemType>::findNode(BinaryNode<ItemType>* subTreePtr, const ItemType& target) const {
+
+	if (subTreePtr != nullptr)
+	{
+		findNode(subTreePtr->getLeftChildPtr(), target);
+		findNode(subTreePtr->getRightChildPtr(), target);
+		if (subTreePtr->getItem() == target)
+			return subTreePtr;
+	}
 	return nullptr;
 }  // end findNode
 
 template<class ItemType>
+void BinarySearchTree<ItemType>::inorder(void visit(ItemType&), BinaryNode<ItemType> * current) const
+{
+	if (current != nullptr)
+	{
+		inorder(visit, current->getLeftChildPtr());
+		ItemType theItem = current->getItem();
+		visit(theItem); // based on Ch. 16 (Carrano & Henry)
+		inorder(visit, current->getRightChildPtr());
+	}
+}
+
+template<class ItemType>
 void BinarySearchTree<ItemType>::inorderTraverse(void visit(ItemType&)) const {
+	inorder(visit, rootPtr);
 }  // end inorder
 
 template<class ItemType>
