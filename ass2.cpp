@@ -9,6 +9,7 @@
 #include <iostream>
 #include <sstream>
 #include <vector>
+#include <climits>
 
 #include "binarysearchtree.h"
 #include "binarynode.h"
@@ -138,6 +139,7 @@ void treeMenuInt() {
 int main() {
 	BinarySearchTree<string> bst1;
 	BinarySearchTree<string> bst2;
+	cout << "Add g,d,k to bst1: " << endl;
 	bst1.add("g");
 	bst1.add("d");
 	bst1.add("k");
@@ -149,7 +151,46 @@ int main() {
 	cout << (bst1.contains("d") ? "OK" : "ERR") << ": bst1 contains d" << endl;
 	cout << (bst1.contains("x") ? "ERR" : "OK") << ": bst1 does not contain x" << endl;
 	cout << (bst1.add("g") ? "ERR" : "OK") << ": adding g second time returns false" << endl;
+	BinarySearchTree<string> bst3("g");
+	cout << (bst3.contains("x") ? "ERR" : "OK") << ": bst3 does not contain x" << endl;
+	cout << (bst3.contains("g") ? "OK" : "ERR") << ": bst3 contains g" << endl;
+	BinarySearchTree<string> bst4(bst2);
+	cout << ((bst4 == bst2) ? "OK" : "ERR") << ": bst4 == bst2" << endl;
+	cout << "Clear bst1 and add for each {m, o, p, q, r, s}: " << endl; 
+	bst1.clear();
+	bst1.add("m");
+	bst1.add("o");
+	bst1.add("p");
+	bst1.add("q");
+	bst1.add("r");
+	bst1.add("s");
+	cout << endl; 
+	bst1.displaySideways();
+	cout << endl;
+
+	cout << ((bst1.getHeight() == 6) ? "OK" : "ERR") << ": bst1 Height is 6" << endl;
+	cout << ((bst1.getNumberOfNodes() == 6) ? "OK" : "ERR") << ": bst1 number of nodes is 6" << endl;
+	cout << "Rebalance bst1: " << endl;
+	bst1.rebalance();
+	cout << endl; 
+	bst1.displaySideways();
+	cout << endl;
+
+	cout << ((bst1.getHeight() == 3) ? "OK" : "ERR") << ": bst1 Height is 3" << endl;
+	cout << ((bst1.getNumberOfNodes() == 6) ? "OK" : "ERR") << ": bst1 number of nodes is 6" << endl;
+	
+	string arr[] = { "i", "j", "c", "a", "b", "h", "k" };
+	cout << "Fill bst2 with array {i, j, c, a, b, h, k}: " << endl;
+	bst2.readTree(arr,sizeof(arr)/sizeof(arr[0]));
+	cout << endl; 
+	bst2.displaySideways();
+	cout << endl;
+
+
+	cout << "Done." << endl; 
+	
 	treeMenuString();
 	// treeMenuInt();
+	
 	return 0;
 }
